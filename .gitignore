@@ -1,1 +1,8 @@
 for_loop
+mexEx1
+mexEx1.c
+mexEx2.*
+*.mex*
+loop_example.py
+*~
+
