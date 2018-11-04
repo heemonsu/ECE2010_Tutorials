@@ -2,8 +2,11 @@ This repository contains experimental code in preparation for some of the topics
 
 # Using C in MATLAB: A Tutorial on using MEX Files
 MATLAB is very convenient to test ideas as it is makes a lot of the menial tasks in writing code very simple to do by providing outstanding support for a lot of different domains. What is being traded off for convienece is the pure performace of the code that you write, from say, languages like C or C++, which are much more difficult to work with than MATLAB but much faster. However, MATLAB is still highly efficient for any kind of matrix operations. All the built-in functions that are in use like A .* B, or A \ B run on efficiently written code in the background which utilises a concept call *vectorisation*. What it means that any operation where vectors are involved, it runs very quick in MATLAB. So if you have a logic that you want to implement in MATLAB and you can think about it in forms of any kind of vector operation, you can gain huge performance. However, if you have a complicated code that has a lot of for loops running, your performance will be quite slow, because you have line which are being executed sequentially, and there is no way to vectorise what you want to achieve.
+
 In situations like these, compiled languages such as C and C++ are quite fast and can turn out to outperform MATLAB scripts quite significantly. To help with this, MATLAB actually allows you to run C code directly inside MATLAB. So let's say you have a particular task that has a lot of for loops and is turning out to be a bottleneck in the performance of your code, you can write the same functions in C, and have it run directly from your MATLAB scripts. 
+
 You can do this my creating whats called a MEX file. A MEX file is a compiled version of you C source code which is specially compiled such that it can be called directly from inside MATLAB, as a simple function. In order to successfully compile your source code as a MEX file, you have to take special care in your C code to address the variables in a way that is expected by MATLAB.
+
 This tutorial is an introduction to how you can create your own MEX files.
 
 ### MATLAB and C Performance difference
