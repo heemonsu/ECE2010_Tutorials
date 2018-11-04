@@ -15,7 +15,6 @@ int main(){
     int N = (int) (sizeof(vector_1)/sizeof(vector_1[0]));
     
     double *output;
-    // output = malloc(N * sizeof(double));
 
     output = dot_product(vector_1, vector_2, N);
    
