@@ -35,7 +35,7 @@ mex multiply_mex.c
 1. Again, open your `multiplication_example.m` file and change the line where you are calling your `multiply_matlab` function and change that to callling the `multiply_mex` function instead.
 2. Your final line should look something like
 ```
-C = multiply_mex(A, B, N);
+C = multiply_mex(A, B, dimension);
 ```
 3. Notice that you literally didn't have to change anything else in your MATLAB script. Try to run the `multiplication_example.m` file again. Notice the change in execution time! 
 
