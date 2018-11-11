@@ -9,54 +9,41 @@ You can do this my creating whats called a MEX file. A MEX file is a compiled ve
 
 This tutorial is an introduction to how you can create your own MEX files.
 
-### MATLAB and C Performance difference
-1. `for_looop_example.m` shows a simple for loop which increments a variable's value for a total of 1000 x 16000000 times.
-2. For one set of calculations, we calculate the time it took for our computer to execute it as one of the elements in the vector `time`.
-3. We repeat this experiment 10 times and calculate the average execution times over the repititions. Note the execution time.
-4. Now we have the same operations, but this time written in C in the file `for_loop.c`
-5. Compile this on your computer using the following command ` gcc -O for_loop.c -o for_loop`. Run this file using `./for_loop` and see the execution time.
+### Create a vector multiplication function.
+1. By now, you should be familiar with the `.*` operation which can do elementwise multiplication between two vectors.
+2. We will start by creating our own MATLAB function which can do the same thing. Let's call it `multiply_matlab`. To help you with this, look at the starter code `multiply_matlab.m` which defines such a function. 
+    1. The function takes in 3 arguments, vector A, vector B and length of the vector.
+    2. The output is a vector that contains the multiplication of the corresponding elements of the input vectors.
+3. However, you will notice it doesn't really do anything right now. Add you own implementation of the multiplication without changing the input arguments or the output format.
 
-### Using the C code to create a MEX file
-1. You can't directly use any C source code in MATLAB. There are a few things that you have to change to make you C source code compatible with what MATLAB expects.
-2. Look at the `for_loop_mex.c` file to see what the compatible version of the previous C code looks like. Look for things that have changed, and what has remained the same.
-3. The `int main()` function is replaced with a `void mexFunction()` function which has 4 parameters. These parameters handle the exchange of variable between MATLAB and C. The specifics are explained below:
-    1. `nlhs`: Number of terms on the left hand side of the command in MATLAB.
-    2. `plhs` : All the left hand side variables.
-    3. `nrhs` : Number of terms on the right hand side.
-    4. `prhs` : All the variable on the right hand side of the equation.
-4. You use the left hand side mxArray to output what you computes and the right hand side mxArray to get the MATLAB variable that you want to receive has arguments for the function.
-5. For this example, there are no inputs, so we will just leave that for now.
-6. Now we want to return the mean time that we calculated. We do this by using the `mxCreateDoubleScalar()` function from the `mex.h` library that was imported earlier.
-7. Look at line 32. We are assigning the first variable on the left hand side(`plhs[0]`) the value of `mean_sec`.
-8. That's it. This is enough for us to compile this as  MEX file.
-9. Compile this source code using the following command `mex for_loop_mex.c`. You should now see something similar to for_loop_mex.mexa64 (the extension depends on your operating system).
-10. You now have your first MEX file ready. Open your MATLAB window and write `mean_time = for_loop_mex()` in the command window. Check your execution time now.
+### Using your own function in a different script.
+1. Once you are done, open the `multiplication_example.m` file and see what's going on there. There are comments to help you out.
+2. Run this file to see if everything works correctly. Note the execution time.
 
-### Handling Input and Output arguments correctly
-1. Let's move on to a more involved function where were are replicating the elementwise multiplication for two vectors. What is interesting here is that we will be giving 'MATLAB variables' as arguments to the function, converting them into 'C variables', and then converting the results in 'C variables' to 'MATLAB variables' again.
-2. Open the `multiplication_example.m` and see whats going there. We are defining two really long vectors, and multiplying them in three different ways.
-    1. Using the in built operator `.*` which makes use the vectorisation approach we talked about earlier.
-    2. Defining a MATLAB function doing the same thing, using only for loops.
-    3. Writing C source code for and making use of a MEX function.
-2. Take a look at the `multiply_matlab.m` function to see how you can do this using for loops in MATLAB.
-3. Now take a look at the`multiply_c.c` file to see what a C code doing the same thing might look like.
-4. Open the `multiply_mex.c` side by side to see the differences that these two codes have.
-5. As you could probably guess, we again replace the `main()` routine by the `mexFunction()` function. Try to recall what the 4 arguments here are.
-6. To assign the first input vector from the MATLAB arguments, we take the first value in the right hand side array(`prhs`) and use the `mxGetPr()` function to properly 'convert' the MATLAB variable into a C array, `vector_1`. We repeat this for the second array.
-7. Now returning the `output` array after multiplication is not really straightforward.
-8. Since `plhs` directly supplies whatever is assigned to it to MATLAB, we can't really define  `plhs[0]` as a C array. We have to use `mex.h` functions to create an array that is understood by MATLAB. We do this by creating a 1 x N matrix using the `mxCreateDoubleMatrix(1, N, mxREAL)` function.
-9. Now the problem is that what we have an `output` array which is an array of doubles as C knows it, but we can't assign that directly using `plhs[0] = output` because the variables on the either side are different data types.
-10. This issue is addressed by using the `memcpy` function from the `string.h` library which __copies__ `N*sizeof(double)` amount of values stored in memory, __starting from__ the memory location of the first element of `output` array, to the __first memory location__ of the `plhs[0]` which we get from the `mxGetPr` function.
-11. In order to copy the `output` values, we have to temporarily store all of its values in whats called the *heap memory* which we then have to 'release' using the `free(output)` command.
-12. Now the source code is ready to be compiled as a MEX file. Again use `mex multiply_mex.c` in your command line to get a mex file.
-13. Once you have the MEX file compiled according to your operating system, you can run the `multiplication_example.m` file to see the performance differences between the three different approaches.
+### Using a C source code to create a MEX file
+1. Now time to move on to the fun part. Notice that you are also provided a `multiply_mex.c` file which is a C source file which implements the same function of multiplying two vectors.
+2. To compile this source code as a MEX, type the following command in your command window.
+```
+mex multiply_mex.c
+```
+3. You will notice that this generates a new file of the same name but with a different extension. Sweet! You created your first MEX file.
+4. Now you can open the `multiply_mex.c` file using any text editor(Sublime Text, Atom, etc.) to see how the source code actually looks. If you are familiar with C, the comments can help you understand whats going on in there. If not, you don't have to worry about it right now.
 
-### Checklist
-- [x] Write sample code to compare performance of C and MATLAB, prove that MATLAB is in fact slower for for loops.
-- [x] Create MATLAB sample function for elementwise operations.
-- [x] Create C sample function for elementwise operations.
-- [x] Write the details of making a function compatible for use as MEX file.
-- [x] Convert the C sample to a MEX file to be used in MATALB.
+### Using the MEX function in your script.
+1. Again, open your `multiplication_example.m` file and change the line where you are calling your `multiply_matlab` function and change that to callling the `multiply_mex` function instead.
+2. Your final line should look something like
+```
+C = multiply_mex(A, B, N);
+```
+3. Notice that you literally didn't have to change anything else in your MATLAB script. Try to run the `multiplication_example.m` file again. Notice the change in execution time! 
+
+### Conclusion
+In this example, you learnt 
+- [x] What a MEX file is, and what are the advantages in using it.
+- [x] Creating your own MEX file using a C source code.
+- [x] Using the MEX file function in your script.
+
+### Assignment
 
 
 ### References
